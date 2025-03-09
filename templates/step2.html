@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Gerador de QR Code - Passo 2{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="main-container">
+        <h1>Gerador de QR Code Animado</h1>
+        <div class="progress-steps">
+            <div class="step">1. URL</div>
+            <div class="step active">2. GIF</div>
+            <div class="step">3. Resultado</div>
+        </div>
+        <form method="post" action="{{ url_for('step3') }}" enctype="multipart/form-data">
+            <input type="hidden" name="url" value="{{ url }}">
+            
+            <div class="section-box upload-section">
+                <h2>Escolha o GIF</h2>
+                <div class="gif-options">
+                    <div class="predefined-gifs">
+                        <h3>Biblioteca de GIFs</h3>
+                        <div class="gif-grid">
+                            {% for gif in predefined_gifs %}
+                            <div class="gif-item">
+                                <input type="radio" name="gif_choice" value="predefined:{{ gif.filename }}" id="gif_{{ loop.index }}" class="gif-radio">
+                                <label for="gif_{{ loop.index }}" class="gif-label">
+                                    <img src="{{ gif.url }}" alt="{{ gif.filename }}">
+                                    <p>{{ gif.filename }}</p>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="upload-custom-gif">
+                        <h3>Ou faça upload do seu GIF</h3>
+                        <div class="file-input-wrapper">
+                            <input type="radio" name="gif_choice" value="custom" id="custom_gif_radio" style="display: none;">
+                            <input type="file" id="custom_gif" name="custom_gif" accept=".gif" onchange="document.getElementById('custom_gif_radio').checked = true;">
+                            <div class="file-input-placeholder">
+                                <i class="fas fa-cloud-upload-alt file-input-icon"></i>
+                                <div class="file-input-text">Escolha um arquivo ou arraste aqui</div>
+                                <div class="file-input-subtext">Formatos suportados: GIF</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="navigation-buttons">
+                <a href="{{ url_for('step1', url=url) }}" class="btn btn-secondary">Voltar</a>
+                <button type="submit" class="btn btn-sicredi">Gerar QR Code</button>
+            </div>
+        </form>
+        
+        {% if error %}
+        <div class="error alert alert-danger mt-4">{{ error }}</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+    padding: 0 1rem;
+}
+
+.step {
+    flex: 1;
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 0 0.5rem;
+    color: #6c757d;
+    font-weight: 500;
+    position: relative;
+}
+
+.step.active {
+    background: var(--sicredi-green);
+    color: white;
+}
+
+.step:not(:last-child):after {
+    content: '';
+    position: absolute;
+    right: -1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 2px;
+    background: #dee2e6;
+}
+
+.gif-options {
+    display: grid;
+    gap: 2rem;
+}
+
+.gif-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.gif-item {
+    position: relative;
+}
+
+.gif-radio {
+    display: none;
+}
+
+.gif-label {
+    display: block;
+    padding: 0.5rem;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gif-label img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.gif-radio:checked + .gif-label {
+    border-color: var(--sicredi-green);
+    box-shadow: 0 0 0 2px rgba(0, 105, 62, 0.1);
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    color: white;
+}
+</style>
+{% endblock %}

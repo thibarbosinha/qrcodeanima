@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Gerador de QR Code - Passo 3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="main-container">
+        <h1>Gerador de QR Code Animado</h1>
+        <div class="progress-steps">
+            <div class="step">1. URL</div>
+            <div class="step">2. GIF</div>
+            <div class="step active">3. Resultado</div>
+        </div>
+
+        <div class="section-box result-section">
+            <h2>Resultado</h2>
+            <div class="result-grid">
+                <div class="result-item">
+                    <h3>GIF Original</h3>
+                    <img src="{% if gif_choice and gif_choice.startswith('predefined:') %}/static/predefined_gifs/{{ background_filename }}{% else %}/uploads/{{ background_filename }}{% endif %}" alt="GIF Original">
+                </div>
+                <div class="result-item">
+                    <h3>QR Code Gerado</h3>
+                    <div class="qr-code-container">
+                        <img src="{{ qr_code }}" alt="QR Code Animado">
+                        <div class="download-button-container">
+                            <a href="{{ qr_code }}" download class="btn btn-success" style="background-color: #00693E; border-color: #00693E;">Baixar QR Code</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation-buttons">
+                <a href="{{ url_for('step1') }}" class="btn btn-secondary">Novo QR Code</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error alert alert-danger mt-4">{{ error }}</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+    padding: 0 1rem;
+}
+
+.step {
+    flex: 1;
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 0 0.5rem;
+    color: #6c757d;
+    font-weight: 500;
+    position: relative;
+}
+
+.step.active {
+    background: var(--sicredi-green);
+    color: white;
+}
+
+.step:not(:last-child):after {
+    content: '';
+    position: absolute;
+    right: -1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 2px;
+    background: #dee2e6;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.result-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 105, 62, 0.08);
+    text-align: center;
+}
+
+.result-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.result-item p {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    color: white;
+}
+
+.result-item .qr-code-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.result-item .download-button-container {
+    margin-top: 1rem;
+    text-align: center;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,29 @@
+# Python files
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+*.db
+.env
+/tmp/
+/uploads/
+.DS_Store
+instance/
+
+# Google Cloud SDK
+.gcloudignore
+app.yaml
+*.yaml
+.config/
+credentials.json
+
+# Large files and directories
+*.log
+*.sqlite
+*.sqlite3
+node_modules/
+dist/
+build/
+*.pyc
+predefined_gifs/*.gif

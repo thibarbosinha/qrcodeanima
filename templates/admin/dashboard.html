@@ -1,0 +1,427 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciador de Links - Sicredi{% endblock %}
+
+{% block header_title %}Painel Administrativo{% endblock %}
+
+{% block extra_css %}
+    <style>
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background-color: var(--sicredi-light-bg);
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+        .container-fluid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .header {
+            background: linear-gradient(135deg, white, #f8f9fa);
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 105, 62, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 105, 62, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.75rem;
+            color: var(--sicredi-green);
+            font-weight: 600;
+        }
+        .header-buttons {
+            display: flex;
+            gap: 1.25rem;
+            align-items: center;
+        }
+
+        .change-password-btn, .logout-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .change-password-btn {
+            background-color: var(--sicredi-green);
+            color: white;
+            border: none;
+        }
+
+        .logout-btn {
+            background-color: #f8f9fa;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        .change-password-btn:hover {
+            background-color: var(--sicredi-green-dark);
+            transform: translateY(-2px);
+        }
+
+        .logout-btn:hover {
+            background-color: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .btn-sicredi {
+            background-color: var(--sicredi-green);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-sicredi:hover {
+            background-color: var(--sicredi-green-dark);
+            transform: translateY(-2px);
+            color: white;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2.5rem;
+            margin-top: 2rem;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .upload-form {
+            background: linear-gradient(135deg, white, #f8f9fa);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 105, 62, 0.08);
+            border: 1px solid rgba(0, 105, 62, 0.1);
+            position: sticky;
+            top: 2rem;
+        }
+
+        .file-input-wrapper {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            width: 100%;
+            height: 120px;
+            padding: 2rem 1rem;
+            border: 2px dashed var(--sicredi-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.8);
+            font-family: 'Exo 2', sans-serif;
+            color: transparent;
+        }
+
+        .file-input-wrapper input[type="file"]::-webkit-file-upload-button {
+            visibility: hidden;
+            display: none;
+        }
+
+        .file-input-wrapper input[type="file"]::before {
+            content: 'Choose a file or drag it here';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #666;
+            font-weight: 500;
+            pointer-events: none;
+            background-color: var(--sicredi-green);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-wrapper input[type="file"]:hover::before {
+            background-color: var(--sicredi-green-dark);
+            transform: translate(-50%, -50%) translateY(-2px);
+        }
+
+        .file-input-wrapper input[type="file"]:hover {
+            border-color: var(--sicredi-green);
+            background-color: rgba(0, 105, 62, 0.05);
+        }
+        .section-title {
+            color: var(--sicredi-green);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--sicredi-border);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--sicredi-green);
+            box-shadow: 0 0 0 2px rgba(0, 105, 62, 0.1);
+        }
+        .gif-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+            gap: 1rem;
+            padding: 0.5rem;
+        }
+        .gif-item {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 105, 62, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 105, 62, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .gif-item:hover {
+            transform: translateY(-2px);
+        }
+        .gif-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        .gif-item p {
+            margin: 0 0 0.5rem 0;
+            color: #4a5568;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+        }
+        .pagination-btn {
+            background-color: var(--sicredi-green);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .pagination-btn:hover {
+            background-color: var(--sicredi-green-dark);
+            transform: translateY(-2px);
+        }
+        .pagination-btn.active {
+            background-color: var(--sicredi-green-dark);
+        }
+        .pagination-btn:disabled {
+            background-color: #e0e0e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .flash-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        .flash-message.success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .flash-message.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        .modal-content h2 {
+            color: var(--sicredi-green);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        .close {
+            position: absolute;
+            right: 1.5rem;
+            top: 1rem;
+            font-size: 1.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s ease;
+        }
+        .close:hover {
+            color: #333;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid p-4">
+        <div class="header">
+            <h1>Painel Administrativo</h1>
+            <div class="header-buttons">
+                <button onclick="openPasswordModal()" class="change-password-btn">Alterar Senha</button>
+                <a href="{{ url_for('admin.logout') }}" class="logout-btn">Sair</a>
+            </div>
+        </div>
+
+        <!-- Modal de Alteração de Senha -->
+        <div id="passwordModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closePasswordModal()">&times;</span>
+                <h2>Alterar Senha</h2>
+                <form action="{{ url_for('admin.change_password') }}" method="post">
+                    <div class="form-group">
+                        <label for="current_password">Senha Atual</label>
+                        <input type="password" id="current_password" name="current_password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new_password">Nova Senha</label>
+                        <input type="password" id="new_password" name="new_password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password">Confirmar Nova Senha</label>
+                        <input type="password" id="confirm_password" name="confirm_password" required>
+                    </div>
+                    <button type="submit">Alterar Senha</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="sidebar">
+                <div class="upload-form">
+                    <h2 class="section-title">Enviar Novo GIF</h2>
+                    <form action="{{ url_for('admin.upload_gif') }}" method="post" enctype="multipart/form-data">
+                        <div class="file-input-wrapper">
+                            <input type="file" name="gif" accept=".gif" required>
+                        </div>
+                        <button type="submit" class="change-password-btn">Enviar GIF</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <h2 class="section-title">Biblioteca de GIFs</h2>
+                <div class="gif-grid">
+                    {% for gif in gifs[start_idx:end_idx] %}
+                    <div class="gif-item">
+                        <img src="{{ gif.url }}" alt="{{ gif.filename }}">
+                        <p>{{ gif.filename }}</p>
+                        <a href="{{ url_for('admin.delete_gif', filename=gif.filename) }}" class="btn-danger" onclick="return confirm('Tem certeza que deseja excluir este GIF?')">Excluir</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if total_pages > 1 %}
+                <div class="pagination">
+                    <a href="{{ url_for('admin.dashboard', page=1) }}" class="pagination-btn" {% if current_page == 1 %}disabled{% endif %}>Primeira</a>
+                    <a href="{{ url_for('admin.dashboard', page=current_page-1) }}" class="pagination-btn" {% if current_page == 1 %}disabled{% endif %}>Anterior</a>
+                    {% for page in range(1, total_pages + 1) %}
+                    <a href="{{ url_for('admin.dashboard', page=page) }}" class="pagination-btn {% if page == current_page %}active{% endif %}">{{ page }}</a>
+                    {% endfor %}
+                    <a href="{{ url_for('admin.dashboard', page=current_page+1) }}" class="pagination-btn" {% if current_page == total_pages %}disabled{% endif %}>Próxima</a>
+                    <a href="{{ url_for('admin.dashboard', page=total_pages) }}" class="pagination-btn" {% if current_page == total_pages %}disabled{% endif %}>Última</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function openPasswordModal() {
+        document.getElementById('passwordModal').style.display = 'block';
+    }
+
+    function closePasswordModal() {
+        document.getElementById('passwordModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('passwordModal')) {
+            closePasswordModal();
+        }
+    }
+</script>
+{% endblock %}

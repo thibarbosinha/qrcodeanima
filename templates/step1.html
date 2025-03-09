@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Gerador de QR Code - Passo 1{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="main-container">
+        <h1>Gerador de QR Code Animado</h1>
+        <div class="progress-steps">
+            <div class="step active">1. URL</div>
+            <div class="step">2. GIF</div>
+            <div class="step">3. Resultado</div>
+        </div>
+        <form method="post" action="{{ url_for('step2') }}">
+            <div class="section-box url-section">
+                <h2>URL do QR Code</h2>
+                <div class="form-group">
+                    <label for="url">URL que será codificada</label>
+                    <input type="text" id="url" name="url" class="form-control" required placeholder="Digite o site que você deseja gerar o QR Code (ex: https://www.sicredi.com.br)" value="">
+                    <small class="form-text text-muted">A URL deve começar com https:// ou http://</small>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-sicredi mt-4">Avançar</button>
+        </form>
+        {% if error %}
+        <div class="error alert alert-danger mt-4">{{ error }}</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- WhatsApp Floating Button -->
+<a href="https://wa.me/5565981173624?text=dúvidas e sugestões QRCode Animado" class="whatsapp-float" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+</a>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+    padding: 0 1rem;
+}
+
+.step {
+    flex: 1;
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 0 0.5rem;
+    color: #6c757d;
+    font-weight: 500;
+    position: relative;
+}
+
+.step.active {
+    background: var(--sicredi-green);
+    color: white;
+}
+
+.step:not(:last-child):after {
+    content: '';
+    position: absolute;
+    right: -1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 2px;
+    background: #dee2e6;
+}
+
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 40px;
+    right: 40px;
+    background-color: #25d366;
+    color: #FFF;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 30px;
+    box-shadow: 2px 2px 3px #999;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.whatsapp-float:hover {
+    background-color: #128C7E;
+    color: #FFF;
+    transform: translateY(-3px);
+}
+</style>
+{% endblock %}}

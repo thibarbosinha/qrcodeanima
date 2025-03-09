@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+
+{% block title %}Gerador de QR Code{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="main-container">
+        <h1>Gerador de QR Code Animado</h1>
+        <form method="post" action="/generate" enctype="multipart/form-data">
+            <div class="input-sections">
+                <div class="section-box url-section">
+                    <h2>URL do QR Code</h2>
+                    <div class="form-group">
+                        <label for="url">Digite a URL que será codificada</label>
+                        <input type="text" id="url" name="url" class="form-control" required placeholder="https://exemplo.com">
+                    </div>
+                </div>
+
+                <div class="section-box upload-section">
+                    <h2>Upload do GIF</h2>
+                    <div class="form-group">
+                        <label for="background">Carregar GIF personalizado</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="background" name="background" accept=".gif" required>
+                            <div class="file-input-placeholder">
+                                <i class="fas fa-cloud-upload-alt file-input-icon"></i>
+                                <div class="file-input-text">Escolha um arquivo ou arraste aqui</div>
+                                <div class="file-input-subtext">Formatos suportados: GIF</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-sicredi mt-4">Gerar QR Code</button>
+
+            {% if qr_code %}
+            <div class="section-box result-section">
+                <h2>Resultado</h2>
+                <div class="result-grid">
+                    <div class="result-item">
+                        <h3>GIF Original</h3>
+                        <img src="/uploads/{{ background_filename }}" alt="GIF Original">
+                    </div>
+                    <div class="result-item">
+                        <h3>QR Code Gerado</h3>
+                        <img src="{{ qr_code }}" alt="QR Code Animado">
+                        <p>Clique com o botão direito na imagem e selecione "Salvar imagem como..." para baixar</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </form>
+
+        {% if error %}
+        <div class="error alert alert-danger mt-4">{{ error }}</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('background');
+    const fileInputWrapper = document.querySelector('.file-input-wrapper');
+    const fileInputText = document.querySelector('.file-input-text');
+    const fileInputSubtext = document.querySelector('.file-input-subtext');
+
+    fileInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                fileInputText.textContent = 'Arquivo selecionado:';
+                fileInputSubtext.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 100px; max-height: 100px; margin-top: 10px;">`;
+                fileInputWrapper.classList.add('file-selected');
+            };
+            
+            reader.readAsDataURL(file);
+        } else {
+            fileInputText.textContent = 'Escolha um arquivo ou arraste aqui';
+            fileInputSubtext.textContent = 'Formatos suportados: GIF';
+            fileInputWrapper.classList.remove('file-selected');
+        }
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        fileInputWrapper.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        fileInputWrapper.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        fileInputWrapper.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        fileInputWrapper.classList.add('drag-over');
+    }
+
+    function unhighlight(e) {
+        fileInputWrapper.classList.remove('drag-over');
+    }
+
+    fileInputWrapper.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        fileInput.files = files;
+    }
+});
+</script>
+<style>
+    .container-fluid {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .main-container {
+        background: linear-gradient(135deg, white, #f8f9fa);
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 105, 62, 0.1);
+    }
+
+    .main-container h1 {
+        color: var(--sicredi-green);
+        font-size: 2rem;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .input-sections {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-box {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 105, 62, 0.08);
+        border: 1px solid rgba(0, 105, 62, 0.1);
+    }
+
+    .section-box h2 {
+        color: var(--sicredi-green);
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .section-box h3 {
+        color: var(--sicredi-green);
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.75rem;
+        color: #2d3748;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid var(--sicredi-border);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--sicredi-green);
+        box-shadow: 0 0 0 3px rgba(0, 105, 62, 0.1);
+        outline: none;
+    }
+
+    .file-input-wrapper {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        border: 2px dashed var(--sicredi-border);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 249, 250, 0.9));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .file-input-wrapper:hover {
+        border-color: var(--sicredi-green);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(0, 105, 62, 0.05));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 105, 62, 0.1);
+    }
+
+    .file-input-wrapper input[type="file"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .file-input-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        pointer-events: none;
+    }
+
+    .file-input-icon {
+        font-size: 2.5rem;
+        color: var(--sicredi-green);
+        margin-bottom: 0.5rem;
+    }
+
+    .file-input-text {
+        font-size: 1.1rem;
+        color: #4a5568;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .file-input-subtext {
+        font-size: 0.9rem;
+        color: #718096;
+    }
+
+    .file-input-wrapper.drag-over {
+        border-color: var(--sicredi-green);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(0, 105, 62, 0.08));
+        transform: scale(1.02);
+    }
+
+    .preview-container {
+        margin-top: 1.5rem;
+        text-align: center;
+    }
+
+    .preview-image {
+        max-width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 105, 62, 0.08);
+    }
+
+    .result-section {
+        margin-top: 2rem;
+    }
+
+    .result-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    .result-item {
+        text-align: center;
+    }
+
+    .result-item img {
+        max-width: 250px;
+        height: 250px;
+        object-fit: contain;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 105, 62, 0.08);
+        margin-bottom: 1rem;
+    }
+
+    .result-item p {
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+
+    .btn-sicredi {
+        display: block;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding: 1rem;
+        }
+
+        .main-container {
+            padding: 1.5rem;
+        }
+
+        .input-sections {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+</body>
+</html>
+
+<style>
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    max-width: 600px;
+    margin: 2rem auto;
+    align-items: center;
+}
+
+.result-item img {
+    max-width: 150px;
+    height: 150px;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 105, 62, 0.08);
+    margin-bottom: 0.5rem;
+}
+
+.input-preview, .output-preview {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 105, 62, 0.08);
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.input-preview h2, .output-preview h2 {
+    color: var(--sicredi-green);
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.input-preview img, .output-preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 105, 62, 0.08);
+    margin-bottom: 1.5rem;
+    object-fit: contain;
+}
+
+.output-preview p {
+    color: #4a5568;
+    font-size: 1rem;
+    margin-top: 1.5rem;
+    line-height: 1.5;
+}
+
+.btn-sicredi {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 2rem auto 0;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .result-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .container-fluid {
+        padding: 2rem 1rem;
+    }
+
+    .main-container {
+        padding: 2rem;
+    }
+
+    .upload-option {
+        padding: 1.5rem;
+    }
+}
+</style>
+</html>
+
+<style>
+    .file-input-wrapper {
+        margin-bottom: 1rem;
+        position: relative;
+        width: 100%;
+        height: 80px;
+        border: 2px dashed var(--sicredi-border);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+
+
+</style>
+</html>
